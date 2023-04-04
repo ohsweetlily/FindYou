@@ -1,0 +1,135 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["filteredRelationCount"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  companyUser CompanyUser[]
+
+  @@map("company")
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  name        String
+  password    String
+  image       Image?        @relation(fields: [imageId], references: [id])
+  imageId     Int?          @map("image_id")
+  displayName String        @map("display_name")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  reward      Int           @default(0)
+  companyUser CompanyUser[]
+  editedItems Item[]        @relation("edited_user_id")
+  pickupItems Item[]        @relation("pickup_user_id")
+  Board       Board[]
+
+  @@map("user")
+}
+
+model CompanyUser {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int     @unique @map("user_id")
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId Int     @map("company_id")
+
+  @@map("company_user")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  item      Item[]
+  Board     Board[]
+
+  @@map("category")
+}
+
+model Image {
+  id          Int           @id @default(autoincrement())
+  imageUrl    String        @map("image_url")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  user        User[]
+  item        Item[]
+  imageDetail ImageDetail[]
+  Board       Board[]
+
+  @@map("image")
+}
+
+model ImageDetail {
+  id        Int      @id @default(autoincrement())
+  small     String?
+  medium    String?
+  large     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  image     Image?   @relation(fields: [imageId], references: [id])
+  imageId   Int      @unique @map("image_id")
+
+  @@map("image_detail")
+}
+
+enum Status {
+  store
+  transfer
+  pickup
+
+  @@map("status")
+}
+
+model Item {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String
+  status       Status    @default(store)
+  category     Category  @relation(fields: [categoryId], references: [id])
+  categoryId   Int       @map("category_id")
+  editedUser   User      @relation("edited_user_id", fields: [editedUserId], references: [id])
+  editedUserId Int       @map("edited_user_id")
+  pickupUser   User?     @relation("pickup_user_id", fields: [pickupUserId], references: [id])
+  pickupUserId Int?      @map("pickup_user_id")
+  image        Image?    @relation(fields: [imageId], references: [id])
+  imageId      Int?      @map("image_id")
+  pickupDate   DateTime? @map("pickup_date") // 수령일
+  getDate      DateTime  @default(now()) @map("get_date") // 습득일
+  area         String
+  takePlace    String?   @map("take_place") // 보관장소
+  lostPlace    String    @map("lost_place") // 습득장소
+  createdAt    DateTime  @default(now()) @map("created_at") // 작성일
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@map("item")
+}
+
+model Board {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int      @map("user_id")
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  Int      @map("category_id")
+  lostPlace   String   @map("lost_place")
+  lostDate    DateTime @default(now()) @map("lost_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  image       Image?   @relation(fields: [imageId], references: [id])
+  imageId     Int?     @map("image_id")
+
+  @@map("board")
+}

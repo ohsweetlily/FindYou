@@ -1,0 +1,1801 @@
+openapi: 3.0.0
+info:
+  title: 찾아줄게!
+  description: 6팀 데이터 분석 프로젝트 API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+tags:
+  - name: User
+    description: User management
+  - name: Auth
+    description: Auth management
+  - name: Item
+    description: Item management
+  - name: Main
+    description: Main management
+  - name: Image
+    description: Image management
+  - name: Board
+    description: Board management
+paths:
+  /auth/sign-in:
+    post:
+      tags:
+        - Auth
+      summary: 로그인
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: string
+                    default: jsonwebtoken
+        "400":
+          description: 이메일 혹은 비밀번호가 다를 때
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: USER_EMAIL_INPUT_ERROR or USER_PASSWORD_ERROR
+                  errorMessage:
+                    type: string
+                    default: 이메일이 존재하지 않습니다. or 비밀번호가 다릅니다.
+  /auth/sign-out:
+    post:
+      tags:
+        - Auth
+      summary: 로그아웃
+      responses:
+        "200":
+          description: 로그아웃 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: string
+                    default: 로그아웃되었습니다.
+        "400":  
+          description: 로그인 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: USER_LOGOUT_ERROR
+                  errorMessage:
+                    type: string
+                    default: 로그아웃에 실패했습니다.
+  /users:
+    post:
+      tags:
+        - User
+      summary: 회원가입
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                  default: angry@angry.com
+                password:
+                  type: string
+                  default: angryangry12!
+                name:
+                  type: string
+                  default: angryman
+                displayName:
+                  type: string
+                  default: angrybird
+                company:
+                  type: string
+                  nullable: true
+                  default: A
+      responses:
+        "200":
+          description: 회원가입 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        default: 33
+                      email:
+                        type: string
+                        default: angry@angry.com
+                      password:
+                        type: string
+                        default: angryangry12!
+                      name:
+                        type: string
+                        default: angryman
+                      displayName:
+                        type: string
+                        default: angrybird
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2020-03-19T14:21:00"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        example: "2020-03-20T14:21:00"
+                      reward:
+                        type: integer
+                        description: will get a reward if find the lost property
+                        example: 0
+                      company:
+                        type: string
+                        nullable: true
+                        default: A
+        "400":
+          description: 회원가입 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: USER_SIGNUP_ERROR
+                  errorMessage:
+                    type: string
+                    default: 회원가입에 실패했습니다.
+                      
+    get:
+      tags:
+        - User
+      summary: 회원(개인)정보 조회
+      responses:
+        "200":
+          description: 회원(개인)정보 조회 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        default: 33
+                      email:
+                        type: string
+                        default: angry@angry.com
+                      password:
+                        type: string
+                        default: angryangry12!
+                      name:
+                        type: string
+                        default: angryman
+                      displayName:
+                        type: string
+                        default: angrybird
+                      imageUrl:
+                        type: string
+                        default: uploads/1678943303333.jpg
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2020-03-19T14:21:00"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        example: "2020-03-20T14:21:00"
+                      reward:
+                        type: integer
+                        description: will get a reward if find the lost property
+                        example: 10
+                      company:
+                        type: string
+                        nullable: true
+                        default: null
+        "400":
+          description: 회원(개인)정보 조회 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: USER_IDENTIFY_ERROR
+                  errorMessage:
+                    type: string
+                    default: 회원(개인)정보 조회에 실패했습니다.
+    patch:
+      tags:
+        - User
+      summary: 회원(개인)정보 수정
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                email:
+                  type: string
+                  default: angry@angry.com
+                password:
+                  type: string
+                  default: angryangry12!
+                name:
+                  type: string
+                  default: angryman
+                displayName:
+                  type: string
+                  default: angrybird
+                company:
+                  type: string
+                  nullable: true
+                  default: A
+      responses:
+        "200":
+          description: 회원(개인)정보 수정 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        default: 33
+                      email:
+                        type: string
+                        default: angry@angry.com
+                      password:
+                        type: string
+                        default: angryangry12!
+                      name:
+                        type: string
+                        default: angryman
+                      displayName:
+                        type: string
+                        default: angrybird
+                      imageId:
+                        type: integer
+                        default: 1
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2020-03-19T14:21:00"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        example: "2020-03-20T14:21:00"
+                      reward:
+                        type: integer
+                        description: will get a reward if find the lost property
+                        example: 10
+                      company:
+                        type: string
+                        nullable: true
+                        default: A
+        "400":
+          description: 회원(개인)정보 수정 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: USER_EDIT_ERROR
+                  errorMessage:
+                    type: string
+                    default: 회원(개인)정보 수정에 실패했습니다.
+    delete:
+      tags:
+        - User
+      summary: 회원탈퇴
+      responses:
+        "200":
+          description: 회원탈퇴 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: string
+                    default: 회원탈퇴가 완료되었습니다.
+        "400":
+          description: 회원탈퇴 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: USER_DELETE_ERROR
+                  errorMessage:
+                    type: string
+                    default: 회원(개인)정보 삭제에 실패했습니다.
+  /images:
+    post:
+      tags:
+        - Image
+      summary: 이미지 업로드
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: 이미지 업로드 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  imageId:
+                    type: integer
+                    default: 1
+  /images/{size}:
+    get:
+      tags:
+        - Image
+      summary: 리사이징 이미지 가져오기
+      operationId: size에 따른 이미지 가져오기
+      parameters:
+        - name: size
+          in: path
+          description: origin, small, medium, large 이미지 가져오기
+          required: true
+          example: origin
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 리사이징 이미지 가져오기 성공
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+  /items:
+    post:
+      tags:
+        - Item
+      summary: 분실물 등록
+      operationId: addItem
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                name:
+                  type: string 
+                  example: 반스 숄더백
+                description:
+                  type: string
+                  example: 카드가 들어있는 반스 숄더백을 보관하고 있습니다.
+                categoryName:
+                  type: string
+                  example: 가방
+                area:
+                  type: string
+                  example: 도봉구
+                lostPlace:
+                  type: string
+                  example: 경일운수
+                takePlace:
+                  type: string
+                  example: 분실물 센터
+                status:
+                  type: string
+                  example: store
+                getDate:
+                  type: string
+                  example: "2023-03-16"
+                image:
+                  type: string
+                  example: binary          
+      responses:
+        "200":
+          description: 분실물 등록 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 17
+                      name:
+                        type: string
+                        example: 반스 숄더백
+                      description:
+                        type: string
+                        example: 카드가 들어있는 반스 숄더백을 보관하고 있습니다.
+                      status:
+                        type: string
+                        example: store
+                      categoryId:
+                        type: integer
+                        example: 3
+                      editedUserId:
+                        type: integer
+                        example: 3
+                      pickupUserId:
+                        type: integer
+                        example: null
+                      imageId:
+                        type: integer
+                        example: 4
+                      pickupDate:
+                        type: string
+                        example: null
+                      getDate:
+                        type: string
+                        example: "2023-03-16T00:00:00"
+                      area:
+                        type: string
+                        example: 도봉구
+                      takePlace:
+                        type: string
+                        example: 분실물 센터 
+                      lostPlace:
+                        type: string
+                        example: 경일운수
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T15:07:16.218Z"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T15:07:16.218Z"  
+        "400":
+          description: 분실물 등록 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    default: ITEM_CREATE_ERROR
+                  errorMessage:
+                    type: string
+                    default: 분실물 등록에 실패했습니다.             
+    get:
+      tags:
+        - Item
+      summary: 분실물 검색(필터 + 이름+기간)
+      operationId: configAllItem
+      parameters:
+        - in: query
+          name: categoryNames
+          schema:
+            type: string
+            description: 필터
+            example: 가방, 지갑
+        - in: query
+          name: name
+          schema:
+            type: string
+            description: 이름
+            example: 반스
+        - in: query
+          name: duration
+          schema:
+            type: string
+            description: 기간
+            example: 3일          
+      responses:
+        "200":
+          description: 분실물 검색 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: 
+                    type: object
+                    properties:
+                      items: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 17
+                            name:
+                              type: string
+                              example: 반스 숄더백
+                            categoryName:
+                              type: string
+                              example: 가방
+                            imageUrl:
+                              type: string
+                              example: uploads/medium/1679213725675.jpg
+                            getDate:
+                              type: string
+                              example: "2023-03-10"
+                            takePlace:
+                              type: string
+                              example: 회사 내 분실센터
+                      totalItems:
+                        type: integer
+                        example: 100
+                      totalPages:
+                        type: integer
+                        example: 10
+        "400":
+          description: 분실물 검색 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    default: ITEM_SEARCH_ERROR
+                  errorMessage:
+                    type: string
+                    default: 분실물 검색에 실패했습니다.  
+  /items/pickup/{id}:   
+    patch:
+      tags:
+        - Item
+      summary: 분실물 회수
+      operationId: editItem
+      parameters:
+        - name: id
+          in: path
+          description: Patch 방식을 통해 특정 분실물 수정
+          required: true
+          example: 17
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    status:
+                      type: string
+                      example: pickup  
+                    pickupDate:
+                      type: string
+                      format: date-time
+                      example: "2023-03-16T15:53:36.345Z"
+      responses:
+        "200":
+          description: 분실물 회수 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 17
+                      name:
+                        type: string
+                        example: 반스 숄더백
+                      description:
+                        type: string
+                        example: 카드가 들어있는 반스 숄더백을 보관하고 있습니다.
+                      status:
+                        type: string
+                        example: pickup
+                      categoryId:
+                        type: integer
+                        example: 3
+                      editedUserId:
+                        type: integer
+                        example: 3
+                      pickupUserId:
+                        type: integer
+                        example: 1
+                      imageId:
+                        type: integer
+                        example: 4
+                      pickupDate:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T15:53:36.345Z"
+                      getDate:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T15:53:36.345Z"
+                      area:
+                        type: string
+                        example: 도봉구
+                      takePlace:
+                        type: string
+                        example: 회사 내 분실 센터  
+                      lostPlace:
+                        type: string
+                        example: 경일운수
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T15:07:16.218Z"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T15:48:37.765Z"
+        "400":
+          description: 분실물 회수 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    default: ITEM_PICKUP_ERROR
+                  errorMessage:
+                    type: string
+                    default: 분실물 회수에 실패했습니다.  
+  /items/{id}:   
+    patch:
+      tags:
+        - Item
+      summary: 분실물 수정
+      operationId: editItem
+      parameters:
+        - name: id
+          in: path
+          description: Patch 방식을 통해 특정 분실물 수정
+          required: true
+          example: 17
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                data:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: 반스 숄더백
+                    description:
+                      type: string
+                      example: 카드가 들어있는 반스 숄더백을 보관하고 있습니다.
+                    status:
+                      type: string
+                      example: pickup
+                    area:
+                      type: string
+                      example: 도봉구
+                    takePlace:
+                      type: string
+                      example: 회사 내 분실 센터  
+                    lostPlace:
+                      type: string
+                      example: 경일운수
+                    getDate:
+                      type: string
+                      example: "2023-03-16"
+                    categoryName:
+                      type: string
+                      example: 핸드폰
+                    image:
+                      type: string
+                      format: binary
+      responses:
+        "200":
+          description: 분실물 수정 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 17
+                      name:
+                        type: string
+                        example: 반스 숄더백
+                      description:
+                        type: string
+                        example: 카드가 들어있는 반스 숄더백을 보관하고 있습니다.
+                      status:
+                        type: string
+                        example: pickup
+                      categoryId:
+                        type: integer
+                        example: 3
+                      editedUserId:
+                        type: integer
+                        example: 3
+                      pickupUserId:
+                        type: integer
+                        example: 1
+                      imageId:
+                        type: integer
+                        example: 4
+                      pickupDate:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T15:53:36.345Z"
+                      getDate:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T00:00:00"
+                      area:
+                        type: string
+                        example: 도봉구
+                      takePlace:
+                        type: string
+                        example: 회사 내 분실 센터  
+                      lostPlace:
+                        type: string
+                        example: 경일운수
+                      createdAt:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T15:07:16.218Z"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        example: "2023-03-16T15:48:37.765Z"
+        "400":
+          description: 분실물 수정 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    default: ITEM_EDIT_ERROR
+                  errorMessage:
+                    type: string
+                    default: 분실물 수정에 실패했습니다.  
+    get:
+      tags:
+        - Board
+      summary: 찾아주세요 게시글 상세조회
+      parameters:
+        - name: id
+          in: path
+          description: 특정 게시글 id
+          required: true
+          example: 17
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 상세조회 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        default: 2
+                      name:
+                        type: string
+                        default: 휴대폰 찾아주세요!
+                      description:
+                        type: string
+                        default: 36개월 할부 휴대폰이 사라졌어요..
+                      status:
+                        type: string
+                        default: store
+                      lostPlace:
+                        type: string
+                        default: 집앞
+                      takePlace:
+                        type: string
+                        default: 분실물센터
+                      categoryName:
+                        type: string
+                        default: 핸드폰
+                      userName:
+                        type: string
+                        default: 달달
+                      imageUrl:
+                        type: string
+                        default: uploads/medium/1679294981674.jpg  
+                      getDate:
+                        type: string
+                        default: "2023-03-19"
+                      createdAt:
+                        type: string
+                        default: "2023-03-20"
+        "400":
+          description: 분실물 상세조회 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    default: ITEM_FIND_ERROR
+                  errorMessage:
+                    type: string
+                    default: 분실물 상세 조회에 실패했습니다.  
+    delete:
+      tags:
+        - Item
+      summary: 분실물 삭제
+      operationId: deleteItem
+      parameters:
+        - name: id
+          in: path
+          description: Delete 방식을 통해 특정 분실물 삭제
+          required: true
+          example: 17
+          schema:
+            type: string        
+      responses:
+        "200":
+          description: 분실물 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    default: 분실물 삭제가 완료되었습니다.
+        "400":
+          description: 분실물 삭제 실패
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    default: ITEM_DELETE_ERROR
+                  errorMessage:
+                    type: string
+                    default: 분실물 삭제에 실패했습니다. 
+  /boards:
+    post:
+      tags:
+        - Board
+      summary: 찾아주세요 게시글 등록
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                name:
+                  type: string
+                  default: 지갑아 제발 돌아와줘
+                description:
+                  type: string
+                  default: 지갑이 시도때도 없이 사라져요
+                categoryName:
+                  type: string
+                  default: 지갑
+                lostPlace:
+                  type: string
+                  default: 버스터미널
+                lostDate:
+                  type: string
+                  default: "2023-03-16"
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: 게시글 등록 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        default: 15
+                      name:
+                        type: string
+                        default: 지갑아 제발 돌아와줘
+                      description:
+                        type: string
+                        default: 지갑이 시도때도 없이 사라져요
+                      categoryId:
+                        type: integer
+                        default: 3
+                      lostPlace:
+                        type: string
+                        default: 버스터미널
+                      lostDate:
+                        type: string
+                        format: date-time
+                        default: "2023-03-19T00:00:00.000"
+                      createdAt:
+                        type: string
+                        format: date-time
+                        default: "2023-03-20T09:10:44.922"
+                      updatedAt:
+                        type: string
+                        format: date-time
+                        default: "2023-03-20T09:10:44.922"
+                      imageId:
+                        type: integer
+                        default: 22
+        "400":
+          description: 게시글 등록 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: BOARD_CREATE_ERROR
+                  errorMessage:
+                    type: string
+                    default: 게시글 등록에 실패했습니다.
+    get:
+      tags:
+        - Board
+      summary: 찾아주세요 게시글 검색
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+            description: 이름
+            example: 반스
+      responses:
+        "200":
+          description: 게시글 검색 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: 
+                    type: object
+                    properties:
+                      boards: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              default: 5
+                            name:
+                              type: string
+                              default: "제목이름"
+                            createdAt:
+                              type: string
+                              default: 2023-03-20
+                            userName:
+                              type: string
+                              default: 달달
+                            categoryName:
+                              type: string
+                              default: 핸드폰
+                      totalBoards:
+                        type: integer
+                        example: 100
+                      totalPages:
+                        type: integer
+                        example: 10
+        "400":
+          description: 게시글 검색 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: BOARD_SEARCH_ERROR
+                  errorMessage:
+                    type: string
+                    default: 게시글 검색에 실패했습니다.
+  /boards/{id}:   
+    get:
+      tags:
+        - Board
+      summary: 찾아주세요 게시글 상세조회
+      parameters:
+        - name: id
+          in: path
+          description: 특정 게시글 id
+          required: true
+          example: 17
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 상세조회 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        default: 2
+                      name:
+                        type: string
+                        default: 휴대폰 찾아주세요!
+                      description:
+                        type: string
+                        default: 36개월 할부 휴대폰이 사라졌어요..
+                      lostPlace:
+                        type: string
+                        default: 집앞
+                      categoryName:
+                        type: string
+                        default: 핸드폰
+                      userName:
+                        type: string
+                        default: 달달
+                      imageUrl:
+                        type: string
+                        default: uploads/medium/1679294981674.jpg  
+                      lostDate:
+                        type: string
+                        default: "2023-03-19"
+                      createdAt:
+                        type: string
+                        default: "2023-03-20"
+        "400":
+          description: 게시글 상세조회 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: BOARD_FIND_ERROR
+                  errorMessage:
+                    type: string
+                    default: 게시글 상세 조회에 실패했습니다.
+    patch:
+      tags:
+        - Board
+      summary: 찾아주세요 게시글 수정
+      parameters:
+        - name: id
+          in: path
+          description: 특정 게시글 id
+          required: true
+          example: 17
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                name:
+                  type: string
+                  default: 휴대폰 찾아주세요!
+                description:
+                  type: string
+                  default: 36개월 할부 휴대폰이 사라졌어요..
+                categoryName:
+                  type: string
+                  default: 핸드폰
+                lostPlace:
+                  type: string
+                  default: 버스터미널
+                lostDate:
+                  type: string
+                  default: "2023-03-16"
+                image:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: 게시글 수정 성공
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        default: 2
+                      name:
+                        type: string
+                        default: 휴대폰 찾아주세요!
+                      description:
+                        type: string
+                        default: 36개월 할부 휴대폰이 사라졌어요..
+                      lostPlace:
+                        type: string
+                        default: 집앞
+                      categoryId:
+                        type: string
+                        default: 1
+                      userId:
+                        type: integer
+                        default: 17
+                      imageUrl:
+                        type: string
+                        default: uploads/1679294981674.jpg
+                      lostDate:
+                        type: string
+                        default: "2023-03-19"
+                      createdAt:
+                        type: string
+                        default: "2023-03-20"
+                      updatedAt:
+                        type: string
+                        default: "2023-03-20"
+        "400":
+          description: 게시글 수정 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: BOARD_EDIT_ERROR
+                  errorMessage:
+                    type: string
+                    default: 게시글 수정에 실패했습니다.
+    delete:
+      tags:
+        - Board
+      summary: 찾아주세요 게시글 삭제
+      parameters:
+        - name: id
+          in: path
+          description: 특정 게시글 id
+          required: true
+          example: 17
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 게시글 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    default: 삭제가 완료되었습니다.
+        "400":
+          description: 게시글 수정 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: BOARD_DELETE_ERROR
+                  errorMessage:
+                    type: string
+                    default: 게시글 삭제에 실패했습니다.
+  /main/items: 
+    get:
+      tags:
+        - Main
+      summary: 이번 달 보관/이관 분실물량과 수령 분실물량을 반환
+      responses:
+        "200":
+          description: 분실물량 반환 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      storeItems:
+                        type: integer
+                        default: 10
+                      pickupItems:
+                        type: integer
+                        default: 4
+        "400":
+          description: 분실물량 반환 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: ITEM_LIST_ERROR
+                  errorMessage:
+                    type: string
+                    default: 분실물 데이터를 불러오는데 실패했습니다.
+  /main/rank:
+    get:
+      tags:
+        - Main
+      summary: 분실물 리워드 랭킹(3위까지)
+      responses:
+        "200":
+          description: 랭킹 반환 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        reward:
+                          type: integer
+                example:
+                  data:
+                    [{name1: name1,
+                    reward: 100,
+                    imageUrl: uploads/small/1678943303333.jpg},
+                    {name2: name2,
+                    reward: 50,
+                    imageUrl: uploads/small/1678943303334.jpg},
+                    {name3: name3,
+                    reward: 20,
+                    imageUrl: uploads/small/1678943303335.jpg}]
+        "400":
+          description: 랭킹 반환 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: REWARD_RANK_ERROR
+                  errorMessage:
+                    type: string
+                    default: reward를 기준 랭킹 데이터를 불러오는데 실패했습니다.
+  /main/new:
+    get:
+      tags:
+        - Main
+      summary: 최근 등록된 분실물 5개
+      responses:
+        "200":
+          description: 분실물 반환 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        lostPlace:
+                          type: string
+                        createdAt:
+                          type: string
+                        categoryName:
+                          type: string
+                example:
+                  data:
+                    [{id: 1, name1: name1,
+                    lostPlace: place1,
+                    createdAt: "2023-03-07",
+                    categoryName: 기타},
+                    {id: 2, name2: name2,
+                    lostPlace: place2,
+                    createdAt: "2023-03-06",
+                    categoryName: 가방},
+                    {id: 3, name3: name3,
+                    lostPlace: place3,
+                    createdAt: "2023-03-05",
+                    categoryName: 기타},
+                    {id: 4, name3: name4,
+                    lostPlace: place4,
+                    createdAt: "2023-03-04",
+                    categoryName: 핸드폰},
+                    {id: 5, name3: name5,
+                    lostPlace: place5,
+                    createdAt: "2023-03-03",
+                    categoryName: 옷}]
+        "400":
+          description: 분실물 반환 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: NEW_ITEMS_ERROR
+                  errorMessage:
+                    type: string
+                    default: 최근 분실물 데이터를 불러오는데 실패했습니다.
+  /main/graph/1:
+    get:
+      tags:
+        - Main
+      summary: 월별 총 분실량 / 총 회수량
+      responses:
+        "200":
+          description: 분실량 반환 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        month:
+                          type: string
+                        lost:
+                          type: integer
+                        getBack:
+                          type: integer
+                example:
+                  data:
+                    [{month: January,
+                    lost: 500, getBack: 420},
+                    {month: February,
+                    lost: 420, getBack: 400},
+                    {month: March,
+                    lost: 300, getBack: 127},
+                    {month: April,
+                    lost: 3, getBack: 0},
+                    {month: May,
+                    lost: 51, getBack: 27},
+                    {month: June,
+                    lost: 15, getBack: 10},
+                    {month: July,
+                    lost: 120, getBack: 109},
+                    {month: August,
+                    lost: 200, getBack: 52},
+                    {month: September,
+                    lost: 32, getBack: 13},
+                    {month: October,
+                    lost: 78, getBack: 58},
+                    {month: November,
+                    lost: 99, getBack: 37},
+                    {month: December,
+                    lost: 241, getBack: 194}]
+        "400":
+          description: 분실물 반환 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: MONTHLY_GRAPH_ERROR
+                  errorMessage:
+                    type: string
+                    default: 월별 데이터를 불러오는데 실패했습니다.
+  /main/graph/2:
+    get:
+      tags:
+        - Main
+      summary: 자치구 별 총 분실량 / 총 회수량
+      responses:
+        "200":
+          description: 분실량 반환 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        place:
+                          type: string
+                        lost:
+                          type: integer
+                        getBack:
+                          type: integer
+                example:
+                  data:
+                    [{place: 강서구,
+                    lost: 100, getBack: 50},
+                    {place: 동작구,
+                    lost: 75, getBack: 20},
+                    {place: 은평구,
+                    lost: 30, getBack: 10}]
+        "400":
+          description: 분실물 반환 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: AREA_GRAPH_ERROR
+                  errorMessage:
+                    type: string
+                    default: 자치구별 데이터를 불러오는데 실패했습니다.
+  /main/graph/3:
+    get:
+      tags:
+        - Main
+      summary: 카테고리 별 총 분실량 / 총 회수량
+      responses:
+        "200":
+          description: 분실량 반환 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category:
+                          type: string
+                        lost:
+                          type: integer
+                        getBack:
+                          type: integer
+                example:
+                  data:
+                    [{category: 가방,
+                    lost: 100, getBack: 50},
+                    {category: 핸드폰,
+                    lost: 75, getBack: 20},
+                    {category: 기타,
+                    lost: 30, getBack: 10}]
+        "400":
+          description: 분실물 반환 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: CATEGORY_GRAPH_ERROR
+                  errorMessage:
+                    type: string
+                    default: 카테고리별 데이터를 불러오는데 실패했습니다.
+  /main/graph/4:
+    get:
+      tags:
+        - Main
+      summary: 총 분실량 / 총 회수량
+      responses:
+        "200":
+          description: 분실량 반환 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        value:
+                          type: integer
+                example:
+                  data:
+                    [{name: lost, value: 5085},
+                    {name: getBack, value: 3000}]
+        "400":
+          description: 분실물 반환 실패
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    type: string
+                    default: ALL_LISTS_GRAPH_ERROR
+                  errorMessage:
+                    type: string
+                    default: 총 분실량 데이터를 불러오는데 실패했습니다.
+components:
+  schemas:
+    Company:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          description: Primary Key
+          example: 3
+        name:
+          type: string
+          example: Kotra
+        createdAt:
+          type: string
+          format: date-time
+          description: time created
+          example: "2020-03-19T14:21:00"
+        updatedAt:
+          type: string
+          format: date-time
+          description: time updated
+          example: "2020-03-20T14:21:00"
+    User:
+      type: object
+      required:
+      - name
+      - email
+      - password
+      - displayName
+      properties:
+        id:
+          type: integer
+          description: Primary Key
+          example: 3
+        name:
+          type: string
+          example: John
+          description: 2~15자리
+        email:
+          type: string
+          format: email
+          description: 중복되지 않는 이메일
+          example: John123@example.com
+        password:
+          type: string
+          description: 숫자, 영문자, 특수문자가 하나 이상씩 포함된 8~20자리
+          example: abcabc12!
+        imageId:
+          type: integer
+          description: references image table.
+          example: 2
+        displayName:
+          type: string
+          example: GoodJohn
+          description: 1~15자리
+        createdAt:
+          type: string
+          format: date-time
+          description: time created
+          example: "2020-03-19T14:21:00"
+        updatedAt:
+          type: string
+          format: date-time
+          description: time updated
+          example: "2020-03-20T14:21:00"
+        reward:
+          type: integer
+          description: will get a reward if find the lost property
+          example: 10
+    Category:
+      type: object
+      required:
+        - name
+      properties:
+        id:
+          type: integer
+          description: Primary Key
+          example: 7
+        name:
+          type: string
+          example: bag
+        createdAt:
+          type: string
+          format: date-time
+          description: time created
+          example: "2020-03-19T14:21:00"
+        updatedAt:
+          type: string
+          format: date-time
+          description: time updated
+          example: "2020-03-20T14:21:00"
+    Item:
+      type: object
+      required:
+        - name
+        - description
+        - categoryId
+        - editedUserId
+        - area
+        - lostPlace
+      properties:
+        id:
+          type: integer
+          description: Primary Key
+          example: 12
+        name:
+          type: string
+          example: 검은색 반지갑
+        description:
+          type: string
+          example: 현금이 만원정도 들어있습니다.
+        categoryId:
+          type: integer
+          example: 3
+        editedUserId:
+          type: integer
+          example: 5
+        pickupUserId:
+          type: integer
+          example: 2
+        imageId:
+          type: integer
+          description: references image table.
+          example: 16
+        pickupDate:
+          type: string
+          format: date-time
+          example: "2020-03-22T14:21:00"
+        area:
+          type: string
+          example: 관악구
+        takePlace:
+          type: string
+          example: 관악구 분실물센터
+        lostPlace:
+          type: string
+          example: 삼이택시
+        createdAt:
+          type: string
+          format: date-time
+          description: time created
+          example: "2020-03-19T14:21:00"
+        updatedAt:
+          type: string
+          format: date-time
+          description: time updated
+          example: "2020-03-22T14:21:00"
+    Image:
+      type: object
+      required:
+        - imageUrl
+      properties:
+        id:
+          type: integer
+          description: Primary Key
+        imageUrl:
+          type: string
+          example: uploads/167913725675.jpg
+        createdAt:
+          type: string
+          format: date-time
+          description: time created
+          example: "2023-03-16 15:06:18.850"
+        updatedAt:
+          type: string
+          format: date-time
+          description: time updated
+          example: "2023-03-16 15:06:18.850"
+    ImageDetail:
+      type: object
+      required:
+        - imageId
+        - small
+        - medium
+        - large
+      properties:
+        id:
+          type: integer
+          description: Primary Key
+        imageId:
+          type: integer
+          example: 17
+        small:
+          type: string
+          example: uploads/small/167913725675.jpg
+        medium:
+          type: string
+          example: uploads/medium/167913725675.jpg
+        large:
+          type: string
+          example: uploads/large/167913725675.jpg
+        createdAt:
+          type: string
+          format: date-time
+          description: time created
+          example: "2023-03-16 15:06:18.850"
+        updatedAt:
+          type: string
+          format: date-time
+          description: time updated
+          example: "2023-03-16 15:06:18.850"
+    Board:
+      type: object
+      required:
+        - name
+        - description
+        - categoryId
+        - userId
+        - lostPlace
+        - lostDate
+      properties:
+        id:
+          type: integer
+          description: Primary Key
+          example: 12
+        name:
+          type: string
+          example: 검은색 반지갑
+        description:
+          type: string
+          example: 현금이 만원정도 들어있습니다.
+        categoryId:
+          type: integer
+          example: 3
+        userId:
+          type: integer
+          example: 5
+        imageId:
+          type: integer
+          description: references image table.
+          example: 16
+        lostPlace:
+          type: string
+          example: 삼이택시
+        lostDate:
+          type: string
+          format: date-time
+          description: time created
+          example: "2020-03-17T14:21:00"
+        createdAt:
+          type: string
+          format: date-time
+          description: time created
+          example: "2020-03-19T14:21:00"
+        updatedAt:
+          type: string
+          format: date-time
+          description: time updated
+          example: "2020-03-22T14:21:00"
